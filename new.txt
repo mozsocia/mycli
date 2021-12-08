@@ -1,0 +1,675 @@
+Round Robin :
+
+#include <stdio.h>
+#include <conio.h>
+
+void main()
+{
+    // initlialize the variable name
+    int i, NOP, sum = 0, count = 0, y, quant, wt = 0, tat = 0, at[10], bt[10], temp[10];
+    float avg_wt, avg_tat;
+    printf(" Total number of process in the system: ");
+    scanf("%d", &NOP);
+    y = NOP; // Assign the number of process to variable y
+
+    // Use for loop to enter the details of the process like Arrival time and the Burst Time
+    for (i = 0; i < NOP; i++)
+    {
+        printf("\n Enter the Arrival and Burst time of the Process[%d]\n", i + 1);
+        printf(" Arrival time is: \t"); // Accept arrival time
+        scanf("%d", &at[i]);
+        printf(" \nBurst time is: \t"); // Accept the Burst time
+        scanf("%d", &bt[i]);
+        temp[i] = bt[i]; // store the burst time in temp array
+    }
+    // Accept the Time qunat
+    printf("Enter the Time Quantum for the process: \t");
+    scanf("%d", &quant);
+    // Display the process No, burst time, Turn Around Time and the waiting time
+    printf("\n Process No \t\t Burst Time \t\t TAT \t\t Waiting Time ");
+    for (sum = 0, i = 0; y != 0;)
+    {
+        if (temp[i] <= quant && temp[i] > 0) // define the conditions
+        {
+            sum = sum + temp[i];
+            temp[i] = 0;
+            count = 1;
+        }
+        else if (temp[i] > 0)
+        {
+            temp[i] = temp[i] - quant;
+            sum = sum + quant;
+        }
+        if (temp[i] == 0 && count == 1)
+        {
+            y--; //decrement the process no.
+            printf("\nProcess No[%d] \t\t %d\t\t\t\t %d\t\t\t %d", i + 1, bt[i], sum - at[i], sum - at[i] - bt[i]);
+            wt = wt + sum - at[i] - bt[i];
+            tat = tat + sum - at[i];
+            count = 0;
+        }
+        if (i == NOP - 1)
+        {
+            i = 0;
+        }
+        else if (at[i + 1] <= sum)
+        {
+            i++;
+        }
+        else
+        {
+            i = 0;
+        }
+    }
+    // represents the average waiting time and Turn Around time
+    avg_wt = wt * 1.0 / NOP;
+    avg_tat = tat * 1.0 / NOP;
+    printf("\n Average Turn Around Time: \t%f", avg_wt);
+    printf("\n Average Waiting Time: \t%f", avg_tat);
+    getch();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Best fit :
+
+#include <stdio.h>
+
+void main()
+{
+    int fragment[20], b[20], p[20], i, j, nb, np, temp, lowest = 9999;
+    static int barray[20], parray[20];
+    printf("\n\t\t\tMemory Management Scheme - Best Fit");
+    printf("\nEnter the number of blocks:");
+    scanf("%d", &nb);
+    printf("Enter the number of processes:");
+    scanf("%d", &np);
+    printf("\nEnter the size of the blocks:-\n");
+    for (i = 1; i <= nb; i++)
+    {
+        printf("Block no.%d:", i);
+        scanf("%d", &b[i]);
+    }
+    printf("\nEnter the size of the processes :-\n");
+    for (i = 1; i <= np; i++)
+    {
+        printf("Process no.%d:", i);
+        scanf("%d", &p[i]);
+    }
+    for (i = 1; i <= np; i++)
+    {
+        for (j = 1; j <= nb; j++)
+        {
+            if (barray[j] != 1)
+            {
+                temp = b[j] - p[i];
+                if (temp >= 0)
+                    if (lowest > temp)
+                    {
+                        parray[i] = j;
+                        lowest = temp;
+                    }
+            }
+        }
+        fragment[i] = lowest;
+        barray[parray[i]] = 1;
+        lowest = 10000;
+    }
+    printf("\nProcess_no\tProcess_size\tBlock_no\tBlock_size\tFragment");
+    for (i = 1; i <= np && parray[i] != 0; i++)
+        printf("\n%d\t\t%d\t\t%d\t\t%d\t\t%d", i, p[i], parray[i], b[parray[i]], fragment[i]);
+}
+Next FIt:
+#include <iostream>
+#include <algorithm>
+using namespace std;
+struct node
+{
+    int memsize;
+    int allocp = -1;
+    int pos;
+    int allocSize;
+} m[200];
+bool posSort(node a, node b)
+{
+    return a.pos < b.pos;
+}
+bool memSort(node a, node b)
+{
+    return a.memsize < b.memsize;
+}
+int main()
+{
+    int nm, np, choice, i, j, p[200];
+    cout << "Enter number of blocks\n";
+    cin >> nm;
+    cout << "Enter block size\n";
+    for (i = 0; i < nm; i++)
+    {
+        cin >> m[i].memsize;
+        m[i].pos = i;
+    }
+    cout << "Enter number of processes\n";
+    cin >> np;
+    cout << "Enter process size\n";
+    for (i = 0; i < np; i++)
+    {
+        cin >> p[i];
+    }
+    cout << "\n\n";
+    int globalFlag = 0;
+    int pos = -1;
+    for (i = 0; i < np; i++)
+    {
+        int flag = 0;
+        for (j = pos + 1; j < nm; j++)
+        {
+            if (j == nm)
+            {
+                j = 0;
+            }
+            if (j == pos)
+                break;
+
+            if (p[i] <= m[j].memsize && m[j].allocp == -1)
+            {
+                m[j].allocp = i;
+                m[j].allocSize = p[i];
+                flag = 1;
+                pos = j;
+                if (j == nm - 1)
+                {
+                    j = 0;
+                    pos = -1;
+                }
+                break;
+            }
+        }
+        if (flag == 0)
+        {
+            cout << "Unallocated Process P" << i + 1 << "\n";
+            globalFlag = 1;
+        }
+    }
+    sort(m, m + nm, posSort);
+    cout << "\n";
+    int intFrag = 0, extFrag = 0;
+    cout << "Memory\t\t";
+    for (i = 0; i < nm; i++)
+    {
+        cout << m[i].memsize << "\t";
+    }
+    cout << "\n";
+    cout << "P. Alloc.\t";
+    for (i = 0; i < nm; i++)
+    {
+        if (m[i].allocp != -1)
+        {
+            cout << "P" << m[i].allocp + 1 << "\t";
+        }
+        else
+        {
+            cout << "Empty\t";
+        }
+    }
+    cout << "\n";
+    cout << "Int. Frag.\t";
+    for (i = 0; i < nm; i++)
+    {
+        if (m[i].allocp != -1)
+        {
+            cout << m[i].memsize - m[i].allocSize << "\t";
+            intFrag += m[i].memsize - m[i].allocSize;
+        }
+        else
+        {
+            extFrag += m[i].memsize;
+            cout << "Empty\t";
+        }
+    }
+    cout << "\n";
+    cout << "\n";
+    if (globalFlag == 1)
+        cout << "Total External Fragmentation: " << extFrag << "\n";
+    else
+    {
+        cout << "Available Memory: " << extFrag << "\n";
+    }
+
+    cout << "Total Internal Fragmentation: " << intFrag << "\n";
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Sjf:
+
+#include <bits/stdc++.h>
+using namespace std;
+
+struct Process
+{
+    int pid; // Process ID
+    int bt;  // Burst Time
+    int art; // Arrival Time
+};
+
+// Function to find the waiting time for all
+// processes
+void findWaitingTime(Process proc[], int n,
+                     int wt[])
+{
+    int rt[n];
+
+    // Copy the burst time into rt[]
+    for (int i = 0; i < n; i++)
+        rt[i] = proc[i].bt;
+
+    int complete = 0, t = 0, minm = INT_MAX;
+    int shortest = 0, finish_time;
+    bool check = false;
+
+    // Process until all processes gets
+    // completed
+    while (complete != n)
+    {
+
+        // Find process with minimum
+        // remaining time among the
+        // processes that arrives till the
+        // current time`
+        for (int j = 0; j < n; j++)
+        {
+            if ((proc[j].art <= t) &&
+                (rt[j] < minm) && rt[j] > 0)
+            {
+                minm = rt[j];
+                shortest = j;
+                check = true;
+            }
+        }
+
+        if (check == false)
+        {
+            t++;
+            continue;
+        }
+
+        // Reduce remaining time by one
+        rt[shortest]--;
+
+        // Update minimum
+        minm = rt[shortest];
+        if (minm == 0)
+            minm = INT_MAX;
+
+        // If a process gets completely
+        // executed
+        if (rt[shortest] == 0)
+        {
+
+            // Increment complete
+            complete++;
+            check = false;
+
+            // Find finish time of current
+            // process
+            finish_time = t + 1;
+
+            // Calculate waiting time
+            wt[shortest] = finish_time -
+                           proc[shortest].bt -
+                           proc[shortest].art;
+
+            if (wt[shortest] < 0)
+                wt[shortest] = 0;
+        }
+        // Increment time
+        t++;
+    }
+}
+
+// Function to calculate turn around time
+void findTurnAroundTime(Process proc[], int n,
+                        int wt[], int tat[])
+{
+    // calculating turnaround time by adding
+    // bt[i] + wt[i]
+    for (int i = 0; i < n; i++)
+        tat[i] = proc[i].bt + wt[i];
+}
+
+// Function to calculate average time
+void findavgTime(Process proc[], int n)
+{
+    int wt[n], tat[n], total_wt = 0,
+                       total_tat = 0;
+
+    // Function to find waiting time of all
+    // processes
+    findWaitingTime(proc, n, wt);
+
+    // Function to find turn around time for
+    // all processes
+    findTurnAroundTime(proc, n, wt, tat);
+
+    // Display processes along with all
+    // details
+    cout << "Processes "
+         << " Burst time "
+         << " Waiting time "
+         << " Turn around time\n";
+
+    // Calculate total waiting time and
+    // total turnaround time
+    for (int i = 0; i < n; i++)
+    {
+        total_wt = total_wt + wt[i];
+        total_tat = total_tat + tat[i];
+        cout << " " << proc[i].pid << "\t\t"
+             << proc[i].bt << "\t\t " << wt[i]
+             << "\t\t " << tat[i] << endl;
+    }
+
+    cout << "\nAverage waiting time = "
+         << (float)total_wt / (float)n;
+    cout << "\nAverage turn around time = "
+         << (float)total_tat / (float)n;
+}
+
+// Driver code
+int main()
+{
+    Process proc[] = {{1, 6, 1}, {2, 8, 1}, {3, 7, 2}, {4, 3, 3}};
+    int n = sizeof(proc) / sizeof(proc[0]);
+
+    findavgTime(proc, n);
+    return 0;
+}
+
+
+
+Fifo:
+#include <stdio.h>
+int main()
+{
+    int i, j, n, a[50], frame[10], no, k, avail, count = 0;
+    printf("\n ENTER THE NUMBER OF PAGES:\n");
+    scanf("%d", &n);
+    printf("\n ENTER THE PAGE  :\n");
+    for (i = 1; i <= n; i++)
+        scanf("%d", &a[i]);
+    printf("\n ENTER THE NUMBER OF FRAMES :");
+    scanf("%d", &no);
+    for (i = 0; i < no; i++)
+        frame[i] = -1;
+    j = 0;
+    printf("\tref string\t page frames\n");
+    for (i = 1; i <= n; i++)
+    {
+        printf("%d\t\t", a[i]);
+        avail = 0;
+        for (k = 0; k < no; k++)
+            if (frame[k] == a[i])
+                avail = 1;
+        if (avail == 0)
+        {
+            frame[j] = a[i];
+            j = (j + 1) % no;
+            count++;
+            for (k = 0; k < no; k++)
+                printf("%d\t", frame[k]);
+        }
+        printf("\n");
+    }
+    printf("Page Fault Is %d", count);
+    printf("Page HIt Is %d", n-count);
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+Lru:
+#include <stdio.h>
+
+int findLRU(int time[], int n)
+{
+    int i, minimum = time[0], pos = 0;
+
+    for (i = 1; i < n; ++i)
+    {
+        if (time[i] < minimum)
+        {
+            minimum = time[i];
+            pos = i;
+        }
+    }
+    return pos;
+}
+
+int main()
+{
+    int no_of_frames, no_of_pages, frames[10], pages[30], counter = 0, time[10], flag1, flag2, i, j, pos, faults = 0;
+    printf("Enter number of frames: ");
+    scanf("%d", &no_of_frames);
+    printf("Enter number of pages: ");
+    scanf("%d", &no_of_pages);
+    printf("Enter reference string: ");
+    for (i = 0; i < no_of_pages; ++i)
+    {
+        scanf("%d", &pages[i]);
+    }
+
+    for (i = 0; i < no_of_frames; ++i)
+    {
+        frames[i] = -1;
+    }
+
+    for (i = 0; i < no_of_pages; ++i)
+    {
+        flag1 = flag2 = 0;
+
+        for (j = 0; j < no_of_frames; ++j)
+        {
+            if (frames[j] == pages[i])
+            {
+                counter++;
+                time[j] = counter;
+                flag1 = flag2 = 1;
+                break;
+            }
+        }
+
+        if (flag1 == 0)
+        {
+            for (j = 0; j < no_of_frames; ++j)
+            {
+                if (frames[j] == -1)
+                {
+                    counter++;
+                    faults++;
+                    frames[j] = pages[i];
+                    time[j] = counter;
+                    flag2 = 1;
+                    break;
+                }
+            }
+        }
+
+        if (flag2 == 0)
+        {
+            pos = findLRU(time, no_of_frames);
+            counter++;
+            faults++;
+            frames[pos] = pages[i];
+            time[pos] = counter;
+        }
+
+        printf("\n");
+
+        for (j = 0; j < no_of_frames; ++j)
+        {
+            printf("%d\t", frames[j]);
+        }
+    }
+    printf("\n\nTotal Page Faults = %d", faults);
+    printf("\n\nTotal Page Hit = %d",no_of_frames- faults);
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+Opr:
+#include<stdio.h>
+int main()
+{
+    int no_of_frames, no_of_pages, frames[10], pages[30], temp[10], flag1, flag2, flag3, i, j, k, pos, max, faults = 0;
+    printf("Enter number of frames: ");
+    scanf("%d", &no_of_frames);    
+    printf("Enter number of pages: ");
+    scanf("%d", &no_of_pages);    
+    printf("Enter page reference string: ");
+    
+    for(i = 0; i < no_of_pages; ++i){
+        scanf("%d", &pages[i]);
+    }    
+    for(i = 0; i < no_of_frames; ++i){
+        frames[i] = -1;
+    }    
+    for(i = 0; i < no_of_pages; ++i){
+        flag1 = flag2 = 0;        
+        for(j = 0; j < no_of_frames; ++j){
+            if(frames[j] == pages[i]){
+                   flag1 = flag2 = 1;
+                   break;
+               }
+        }        
+        if(flag1 == 0){
+            for(j = 0; j < no_of_frames; ++j){
+                if(frames[j] == -1){
+                    faults++;
+                    frames[j] = pages[i];
+                    flag2 = 1;
+                    break;
+                }
+            }    
+        }
+        
+        if(flag2 == 0){
+         flag3 =0;
+        
+            for(j = 0; j < no_of_frames; ++j){
+             temp[j] = -1;
+            
+             for(k = i + 1; k < no_of_pages; ++k){
+             if(frames[j] == pages[k]){
+             temp[j] = k;
+             break;
+             }
+             }
+            }
+            
+            for(j = 0; j < no_of_frames; ++j){
+             if(temp[j] == -1){
+             pos = j;
+             flag3 = 1;
+             break;
+             }
+            }
+            
+            if(flag3 ==0){
+             max = temp[0];
+             pos = 0;
+            
+             for(j = 1; j < no_of_frames; ++j){
+             if(temp[j] > max){
+             max = temp[j];
+             pos = j;
+             }
+             }            
+            }
+frames[pos] = pages[i];
+faults++;
+        }
+        
+        printf("\n");
+        
+        for(j = 0; j < no_of_frames; ++j){
+            printf("%d\t", frames[j]);
+        }
+    }
+    
+    printf("\n\nTotal Page Faults = %d", faults);
+    printf("\n\nTotal Page Hit = %d", no_of_pages - faults);
+    
+    return 0;
+}
+
